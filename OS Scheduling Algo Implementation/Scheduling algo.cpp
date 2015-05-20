@@ -1,11 +1,3 @@
-/*
-
-Name:     Mehedi Alamgir
-Id  :     11-19155-2
-Topic:     Scheduling Algorithm
-
-*/
-
 
 #include<iostream>
 #include<cstdio>
