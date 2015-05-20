@@ -1,0 +1,526 @@
+# /bin/bash
+# project
+# usage:./pro
+
+# INITIAL INFO 
+touch bdt
+touch tdt
+touch totalDebit
+touch totalCredit
+
+clear
+echo "################################################################"
+echo "#			BANk MANAGEMENT SYSTEM 		       #"
+echo "################################################################"
+
+echo ""
+while [ 1 ]
+do
+	
+	echo "Press e for existing user"
+	echo "Press n to create new user"
+	echo "press q for quit..!!!"
+	echo ""		
+
+	read userType
+	while [ $userType != "e" -a $userType != "n" -a $userType != "q" ] 
+	do
+		echo "Enter your choice again: "	
+		read userType
+
+	done
+	
+	clear
+	if [ $userType == "e" ]
+	then
+		while [ 1 ]
+		do
+		
+		
+		echo ""
+		echo "================================"
+		echo "1) To Create A/c"
+		echo "2) User Transaction"
+		echo "3) Show User info."
+		echo "4) Show All Transaction [Admin]"
+		echo "5) Exit"
+		echo "================================"
+		echo ""
+
+		echo "Choose Your Option"
+		read opp
+
+		REMINDER=0
+		
+		case $opp  in
+			1)
+				
+				echo "Enter your Account Number: "
+				read userAcc
+				
+				if [ -a $userAcc ]
+				then	
+					
+					tra="c"
+					
+					echo ""
+					echo "Enter the Ac_type [ 'c' for Current & 's' for Saving ]";
+					read type
+					while [ $type != "c" -a $type != "s" ]
+					do
+
+						echo "Enter the Ac_type [ 'c' for Current & 's' for Saving ]"
+						read type
+					done
+		
+					if [ $type == "s" ] 
+					then
+
+						cd $userAcc
+						
+
+						if [ -a check1 ]
+						then
+							touch savings
+							rm  -r check1
+							cd ../
+	
+							echo "You have to deposit at least 1000 Tk for create your Account"
+							echo "Enter the Opening Balance::==>"
+							read bal	
+
+							while [ $bal -le 999 ]
+							do
+
+								echo "Enter the Opening Balance::==>"
+								read bal
+
+							done
+							echo "Sucessfully deposit in your Account"
+							echo ""
+							# SAVE DATA
+							echo "$userAcc:$type:$bal:$tra" >> bdt
+							echo "$userAcc:$bal:$tra" >> tdt	
+							echo "$bal" >> totalCredit
+
+							cd $userAcc
+						      	
+							echo "$bal" >> savings	
+							echo "User Account: Savings" >> $userAcc
+						
+							cd ../
+						else
+							cd ../	
+							echo "You already have a Savings Account"
+							echo ""
+						fi
+						
+					fi
+
+					if [ $type == "c" ]
+					then
+						cd $userAcc
+												
+						
+						if [ -a check2 ]
+						then
+							touch current
+							rm -r check2
+							cd ../
+							
+							echo "You have to deposit at least 1000 Tk for create your Account"
+							echo "Enter the Opening Balance::==>"
+							read bal	
+
+							while [ $bal -le 999 ]
+							do
+
+								echo "Enter the Opening Balance::==>"
+								read bal
+
+							done
+							
+							echo ""
+							echo "Sucessfully deposit in your Account"
+							echo ""
+							# SAVE DATA
+							echo "$userAcc:$type:$bal:$tra" >> bdt
+							echo "$userAcc:$bal:$tra" >> tdt	
+							echo "$bal" >> totalCredit
+
+							cd $userAcc
+						      	
+							echo "$bal" >> current	
+							echo "User Account: Current" >> $userAcc
+						
+							cd ../
+						else 
+							cd ../
+							echo "You already have a Current Account"
+							echo ""
+							
+						fi
+						
+						
+					fi
+				else
+					echo "Invalid Account No."
+					echo ""
+				fi
+
+				
+				;;
+			2)
+				
+				echo "Enter your Account Number: "
+				read userAcc
+
+				if [ -a $userAcc ]
+				then
+					
+					echo "Enter the Account_type [ 'c' for Current & 's' for Savings ]";
+					read type
+
+					while [ $type != "c" -a $type != "s" ]
+					do
+						echo "Enter the Account_type [ 'c' for Current & 's' for Savings ]";
+						read type
+					done
+					
+
+					cre=0
+					demo=0
+					creditCheck=0
+
+						
+					
+					if [ $type == "c" ]
+					then
+						cd $userAcc
+
+						if [ -a current ]
+						then
+								 # cd ../
+								echo "Enter the tansaction_type [ 'c' for Credit & 'd' for debit ]";
+								read tra
+	
+								while [ $tra != "c" -a $tra != "d" ]
+								do
+									echo "Enter the tansaction_type [ 'c' for Credit & 'd' for debit ]";
+									read tra
+								done
+	
+								echo "Enter your amount:-"
+								read amount
+								
+								
+								if [ $tra == "d" ]
+								then
+
+									# cd $userAcc	
+									for i in `cat current`
+									do
+										((cre=cre+i))
+									done
+							
+									REMINDER=$cre
+									demo=$REMINDER		
+									creditCheck=`expr $cre - 1000`
+							
+									while [ $amount -gt $creditCheck ]
+									do
+										echo "Insufficient Balance !!! Try Again!"
+										echo "You Can Withdraw Max: $creditCheck Tk."
+										echo "Enter your amount:- "
+										read amount
+									done
+							
+									cd ../
+
+									echo "$userAcc:$amount:$tra" >> tdt
+							  		echo "$amount" >> totalDebit
+									REMINDER=`expr $demo - $amount`
+									echo "Withdraw Sucessfull !"
+									echo "Your Credit Left: $REMINDER Tk."
+							
+									cd $userAcc
+									echo "$REMINDER" > current
+									cd ../
+		  				  
+								else
+									cd ../
+									echo "$userAcc:$amount:$tra" >> tdt
+									echo "$amount" >> totalCredit
+							
+								        cd $userAcc
+									echo "$amount" >> current
+									cd ../
+
+									echo "Sucessfully Deposit in your Account!"
+								fi
+
+						else 
+							cd ../
+							echo "Sorry , You have to open a Current Account First"
+						fi
+
+					
+					else 
+							# echo "Savings Part....."
+							echo ""
+
+							cd $userAcc
+
+							if [ -a savings ]
+							then
+									# cd ../
+									
+
+
+									echo "Enter the tansaction_type [ 'c' for Credit & 'd' for debit ]";
+									read tra
+	
+									while [ $tra != "c" -a $tra != "d" ]
+									do
+										echo "Enter the tansaction_type [ 'c' for Credit & 'd' for debit ]";
+										read tra
+									done
+	
+									echo "Enter your amount:-"
+									read amount
+									
+									if [ $tra == "d" ]
+									then
+										# cd $userAcc	
+										cre=0
+										for i in `cat savings`
+										do
+											((cre=cre+i))
+										done
+
+										calc=0
+										p=0
+										q=0
+										REMINDER=$cre
+										demo=$REMINDER		
+										creditCheck=`expr $cre - 1000`
+										if [ $amount -gt 10000 ]
+										then
+											calc=375
+										elif [ $amount -gt 1000 -a $amount -le 10000 ]
+										then
+											calc=133
+										else
+											calc=33
+										fi
+										
+										if [ $creditCheck -gt $calc ]
+										then												
+											p=`expr $creditCheck - $calc`
+										else
+											p=0
+
+										fi	
+									
+										while [ $amount -gt $p ]
+										do
+											echo "Insufficient Balance !!! Try Again!"
+											echo "You Can Withdraw Max: $p Tk."
+											echo "Enter your amount:- "
+											read amount
+											
+												if [ $amount -gt 10000 ]
+												then
+													calc=375
+												elif [ $amount -gt 1000 -a $amount -lt 10000 ]
+												then
+													calc=133
+												else
+													calc=33
+												fi
+												
+												if [ $creditCheck -gt $calc ]
+												then												
+													p=`expr $creditCheck - $calc`
+												else
+													p=0
+
+												fi
+										done
+							
+										cd ../
+
+										echo "$userAcc:$amount:$tra" >> tdt
+								  		echo "$amount" >> totalDebit
+										q=`expr $amount + $calc`
+										
+										if [ $p -gt 0 ]
+										then
+											REMINDER=`expr $demo - $q`
+											echo "Withdraw Sucessfull "
+										else
+											echo "Your Credit Left: $REMINDER Tk."
+										fi
+										
+										cd $userAcc
+										echo "$REMINDER" > savings
+										cd ../
+			  				  
+									else
+										cd ../
+										echo "$userAcc:$amount:$tra" >> tdt
+										echo "$amount" >> totalCredit
+							
+										cd $userAcc
+										echo "$amount" >> savings
+										cd ../
+
+										echo "Sucessfully Deposit in your Account!"
+				
+									fi
+							else
+								cd ../
+								echo "Sorry , You have to open a savings Account First"
+							fi
+					fi
+
+
+				else
+					echo "Invalid Account...!!!"
+				fi	
+				;;
+
+			3)
+				echo "Enter your Account No:- "
+				read userAcc
+				cre=0
+				if [ -a $userAcc ]
+				then
+					cd $userAcc
+					for i in `cat current`
+					do
+						((cre=cre+i))
+					done
+					
+					demo=0	
+					for i in `cat savings`
+					do
+						((demo=demo+i))
+					done
+
+					echo "********************** User Information *************************"
+					echo ""
+					cat $userAcc
+					echo ""
+					echo "your Credit Left (Current) : $cre"
+					echo ""
+					
+					k=0
+					if [ $demo -gt $k ]
+					then
+						echo "your Credit Left (Savings) : $demo"
+						echo ""	
+
+					fi
+					cd ../							
+							
+				else
+					echo "Invalid Account...!!!"
+					echo ""
+				fi
+				;;
+			4)
+				echo "************************ USER'S DETAILS ****************************"
+				echo ""
+				cat bdt
+				echo ""
+				echo "************************ USER'S TRANSACTION ************************"
+				echo ""		
+				cat  tdt
+				cre=0
+				debit=0
+				res=0
+				for i in `cat totalCredit`
+				do
+					((cre=cre+i))
+				done
+	
+				for i in `cat totalDebit`
+				do
+						((debit=debit+i))
+				done
+		
+		
+				res=`expr $cre - $debit`
+				echo ""
+				echo "TOTAL CREDIT LEFT: $res"
+				;;
+	
+			5)
+				echo "Quiting .....!!!"
+				exit
+		
+			esac
+		done
+
+	elif [ $userType == "n" ]
+	then	
+			echo "Enter your Name: "
+			read  userName
+		
+			echo "Enter your Age: "
+			read  userAge
+		
+			echo "Enter your Sex: "
+			read  userSex
+
+			echo "Enter your Passport No. :"
+			read  userPass
+				
+			while [ -a $userPass ]
+			do
+				echo "Invalid Passport No."
+				echo "Enter your Passport No. :"
+				read  userPass
+			done
+							
+			echo "Enter your Address: "
+			read address
+				
+			echo "Enter your Contact No. :"
+			read contact
+
+			echo "Enter your date of Birth: "
+			echo "Day: " 
+			read day  
+			echo "Month: "
+			read month
+			echo "Year: "
+			read year
+		
+			
+			mkdir $userPass
+			cd $userPass
+			touch tmp	
+			touch check1
+			touch check2
+			echo "Name: $userName" >> tmp
+			echo "Age: $userAge" >> tmp
+			echo "Sex: $userSex" >> tmp
+			echo "PassportNo: $userPass" >> tmp
+			echo "Address: $address" >> tmp
+			echo "Contact No: $contact" >> tmp
+			echo "Date Of Birth: $day/$month/$year" >> tmp
+		
+			touch $userpass
+			cat tmp >> $userPass
+			echo ""
+			echo "Your Account has Successfully created!"
+			echo "Your Account Number is: $userPass"	
+			echo ""
+			
+			cd ../
+	else
+		exit
+	fi
+done
